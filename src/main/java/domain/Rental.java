@@ -58,7 +58,12 @@ public class Rental {
     }
 
     @AssertTrue
-    boolean isBeginingBeforEnd(){
-        return end.isAfter(beginning);
+    public boolean isBeginingBeforEnd(){
+        if(end == null){
+            return true;
+        }else {
+            return end.isAfter(beginning);
+        }
     }
+
 }

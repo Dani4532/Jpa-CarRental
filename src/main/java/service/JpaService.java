@@ -6,29 +6,23 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public record JpaService(EntityManagerFactory entityManagerFactory) implements Service {
-
 
 
     @Override
     public Rental save(Rental rental) {
         var em = entityManagerFactory.createEntityManager();
-        var car = rental.getCar();
-        var rentalStation = rental.getRentalStation();
-        var returnStation = rental.getReturnStation();
-        try{
+        try {
             em.getTransaction().begin();
-            em.merge(car);
-            em.merge(rentalStation);
-            em.merge(returnStation);
             em.persist(rental);
             em.getTransaction().commit();
             return rental;
-        }catch (Exception e){
+        } catch (Exception e) {
             em.getTransaction().rollback();
             throw e;
-        }finally {
+        } finally {
             em.close();
         }
     }
@@ -41,10 +35,10 @@ public record JpaService(EntityManagerFactory entityManagerFactory) implements S
             em.persist(station);
             em.getTransaction().commit();
             return station;
-        }catch (Exception e){
+        } catch (Exception e) {
             em.getTransaction().rollback();
             throw e;
-        }finally {
+        } finally {
             em.close();
         }
 
@@ -53,10 +47,9 @@ public record JpaService(EntityManagerFactory entityManagerFactory) implements S
     @Override
     public Car save(Car car) {
         var em = entityManagerFactory.createEntityManager();
-        var location = car.getLocation();
+
         try {
             em.getTransaction().begin();
-            em.merge(location);
             em.persist(car);
             em.getTransaction().commit();
             return car;
@@ -72,35 +65,76 @@ public record JpaService(EntityManagerFactory entityManagerFactory) implements S
     @Override
     public List<Station> findAllStations() {
         var em = entityManagerFactory.createEntityManager();
-        try{
+        try {
             return em.createQuery("""
-            select  station from Station station
-""",Station.class).getResultList();
-        }catch (Exception e){
+                                select  station from Station station
+                    """, Station.class).getResultList();
+        } catch (Exception e) {
             throw e;
-        }finally {
+        } finally {
             em.close();
         }
     }
 
     @Override
     public List<Car> findAllCars() {
-        return null;
+        var em = entityManagerFactory.createEntityManager();
+        try {
+            return em.createQuery("""
+                                    select car from Car car
+                    """, Car.class).getResultList();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            em.close();
+        }
     }
 
     @Override
     public List<Rental> findAllRentals() {
-        return null;
+        var em = entityManagerFactory.createEntityManager();
+        try {
+            return em.createQuery("""
+                                    select rental from Rental rental
+                    """, Rental.class).getResultList();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            em.close();
+        }
     }
 
     @Override
     public Optional<Rental> findRentalById(long id) {
-        return Optional.empty();
+        var em = entityManagerFactory.createEntityManager();
+        try {
+            var result = em.createQuery("""
+                                    select rental from Rental rental where rental.id =: id
+                    """, Rental.class).setParameter("id", id).getSingleResult();
+            return Optional.of(result);
+        } catch (Exception e) {
+            return Optional.empty();
+        } finally {
+            em.close();
+        }
+
+
     }
 
     @Override
     public Set<Car> findCarsStationedAt(Station station) {
-        return null;
+        var em = entityManagerFactory.createEntityManager();
+        try {
+            var result = em.createQuery("""
+                                    select car from Car car where car.location =: station
+                    """, Car.class).setParameter("station", station).getResultStream();
+            var carSet = result.collect(Collectors.toSet());
+            return carSet;
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            em.close();
+        }
     }
 
     @Override

@@ -3,6 +3,8 @@ package domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,13 +27,15 @@ public class Car {
     @Size(min = 4, max = 9)
     private String plate;
 
-    @Positive
+    @Min(0)
     private double mileage;
 
     private String model;
 
     @ManyToOne
     private Station location;
+
+
 
     @Override
     public boolean equals(Object o) {

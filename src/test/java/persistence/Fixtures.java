@@ -58,6 +58,7 @@ public class Fixtures {
                                 .car(cars.get(0))
                                 .rentalStation(stations.get(0))
                                 .build()
+
                 )
                 .map(service::save)
                 .toList();
