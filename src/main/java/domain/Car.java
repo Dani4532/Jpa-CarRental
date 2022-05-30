@@ -57,4 +57,8 @@ public class Car {
                 "mileage = " + mileage + ", " +
                 "model = " + model + ")";
     }
+
+    public void addMiles(double kmAdd) {
+        if(kmAdd > 0) mileage += kmAdd;
+    }
 }

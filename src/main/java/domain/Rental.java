@@ -4,12 +4,14 @@ package domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import org.assertj.core.internal.bytebuddy.dynamic.loading.InjectionClassLoader;
 import org.hibernate.Hibernate;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+
 @Builder
 @AllArgsConstructor
 @Getter
@@ -23,7 +25,7 @@ public class Rental {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Positive
+    @PositiveOrZero
     private Double drivenKm;
 
     private LocalDateTime beginning;
@@ -31,13 +33,13 @@ public class Rental {
     @Column(name = "endtime")
     private LocalDateTime end;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Car car;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Station rentalStation;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Station returnStation;
 
     public Rental() {
@@ -58,12 +60,21 @@ public class Rental {
     }
 
     @AssertTrue
-    public boolean isBeginingBeforEnd(){
-        if(end == null){
+    public boolean isBeginingBeforEnd() {
+        if (end == null) {
             return true;
-        }else {
+        } else {
             return end.isAfter(beginning);
         }
     }
+
+    @AssertTrue
+    private boolean isFinishedOrUnfinished() {
+        if (end == null && drivenKm == null && returnStation == null) return true;
+        else if (end != null && drivenKm != null && returnStation != null) return true;
+        else return false;
+    }
+
+
 
 }

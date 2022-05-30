@@ -6,11 +6,7 @@ import java.util.*;
 
 public interface Service {
 
-    Rental save(Rental rental);
-
-    Station save(Station station);
-
-    Car save(Car car);
+    <T> T save(T toSave);
 
     List<Station> findAllStations();
 
